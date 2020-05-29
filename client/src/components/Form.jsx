@@ -72,7 +72,7 @@ const EmailInput = styled.input`
   outline-color: ${props => props.isValid ? '#ADADA5' : '#E63946' };
 `;
 
-const DayInputs = styled.form`
+const DayInputs = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -158,7 +158,7 @@ export default () => {
   const courseChange = e => {
     const { value } = e.target;
     setCourse(value);
-    setCourseIsValid(/^[a-zA-Z0-9]*$/.test(value) && value !== '');
+    setCourseIsValid(/^[a-zA-Z0-9 ]*$/.test(value) && value !== '');
   };
   const emailChange = e => {
     const { value } = e.target;
@@ -188,6 +188,7 @@ export default () => {
         dispatch(addRecord(editedResponse));
       }
     });
+    dispatch(toggleFormOff());
   };
 
   const stopPropagation = e => { e.stopPropagation() };
