@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import $ from 'jquery';
@@ -116,10 +116,10 @@ const SubmitButton = styled.button`
   color: white;
   font-weight: bold;
   font-size: 14px;
-  opacity: ${props => props.disabled ? 1 : 0.3};
-  cursor: pointer;
+  opacity: ${props => props.disabled ? 0.3 : 1};
+  cursor: ${props => props.disabled ? 'default' : 'pointer'};;
   :hover {
-    opacity: 0.8;
+    opacity: ${props => props.disabled ? 0.3 : 0.8};
   }
 `;
 
@@ -153,6 +153,7 @@ export default () => {
     setDays({ ...Days, [key]: !Days[key] });
   };
   const checkButton = () => {
+    console.log(`Checking button: ${courseIsValid && roomIsValid && professorIsValid && emailIsValid}`)
     setButtonIsActive(courseIsValid && roomIsValid && professorIsValid && emailIsValid);
   };
   const courseChange = e => {
@@ -224,7 +225,7 @@ export default () => {
             </DaysRow>
           </InputColumn>
           <InputColumn>
-            <SubmitButton disabled={buttonIsActive} onClick={addCourse}>ADD COURSE</SubmitButton>
+            <SubmitButton disabled={!buttonIsActive} onClick={addCourse}>ADD COURSE</SubmitButton>
           </InputColumn>
         </DayInputs>
       </FormContainer>
