@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import $ from 'jquery';
@@ -19,7 +19,7 @@ const FormContainer = styled.div`
   position:fixed;
   background: #F8F8F8;
   border-radius: 5px;
-  padding: 15px 0px 20px 30px;
+  padding: 15px 30px 20px 30px;
   width: 40%;
   height: auto;
   top:50%;
@@ -50,6 +50,7 @@ const CourseInput = styled.input`
   height: 30px;
   padding: 5px 5px 5px 10px;
   border: .3px solid #ADADA5;
+  outline-color: ${props => props.isValid ? '#ADADA5' : '#E63946' };
 `;
 const RoomInput = styled.input`
   width: 200px;
@@ -68,9 +69,10 @@ const EmailInput = styled.input`
   height: 30px;
   padding: 5px 5px 5px 10px;
   border: .3px solid #ADADA5;
+  outline-color: ${props => props.isValid ? '#ADADA5' : '#E63946' };
 `;
 
-const DayInputs = styled.form`
+const DayInputs = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -114,6 +116,7 @@ const SubmitButton = styled.button`
   color: white;
   font-weight: bold;
   font-size: 14px;
+  opacity: ${props => props.disabled ? 1 : 0.3};
   cursor: pointer;
   :hover {
     opacity: 0.8;
@@ -130,13 +133,18 @@ export default () => {
   const days = (daysObj) => Object.keys(daysObj).map((key, i) => <Day key={i} onClick={() => {schedule(key)}} scheduled={daysObj[key]}><DayLabel>{key[0]}</DayLabel></Day>);
 
   // LOCAL FORM STATE and CONTROL
+  const [ buttonIsActive, setButtonIsActive ] = useState(false);
   const [ Course, setCourse ] = useState('');
+  const [ courseIsValid, setCourseIsValid ] = useState('initial');
   const [ Room, setRoom ] = useState('');
+  const [ roomIsValid, setRoomIsValid ] = useState(true);
   const [ Professor, setProfessor ] = useState('');
+  const [ professorIsValid, setProfessorIsValid ] = useState(true);
   const [ Email, setEmail ] = useState('');
+  const [ emailIsValid, setEmailIsValid ] = useState(true);
   const [ Days, setDays ] = useState ({ Su: false, Mo: false, Tu: false, We: false, Th: false, Fr: false, Sa: false });
 
-  // BUTTON HANDLERS
+  // BUTTON/CHANGE HANDLERS
   const dispatch = useDispatch();
   const closeModal = () => {
     dispatch(toggleFormOff());
@@ -144,6 +152,20 @@ export default () => {
   const schedule = (key) => {
     setDays({ ...Days, [key]: !Days[key] });
   };
+  const checkButton = () => {
+    setButtonIsActive(courseIsValid && roomIsValid && professorIsValid && emailIsValid);
+  };
+  const courseChange = e => {
+    const { value } = e.target;
+    setCourse(value);
+    setCourseIsValid(/^[a-zA-Z0-9 ]*$/.test(value) && value !== '');
+  };
+  const emailChange = e => {
+    const { value } = e.target;
+    setEmail(value);
+    setEmailIsValid(/^\w+@psu\.edu$/.test(value) || value === '');
+  };
+  
 
   // API CALLS
   const serverIP = useSelector(state => state.serverIP);
@@ -166,9 +188,15 @@ export default () => {
         dispatch(addRecord(editedResponse));
       }
     });
+    dispatch(toggleFormOff());
   };
 
   const stopPropagation = e => { e.stopPropagation() };
+
+  // CHECK BUTTON STATUS AFTER FORM STATE CHANGES
+  useEffect(() => {
+    checkButton();
+  }, [courseIsValid, roomIsValid, professorIsValid, emailIsValid]);
 
   // LAYOUT
   return (
@@ -177,7 +205,7 @@ export default () => {
         <TextInputs>
           <InputColumn>
             <FormLabel>Course Name</FormLabel>
-            <CourseInput placeholder='ex. Applied Calculus' onChange={e => { setCourse(e.target.value) }} />
+            <CourseInput isValid={courseIsValid} placeholder='ex. Applied Calculus' onChange={courseChange} />
             <FormLabel>Room Number</FormLabel>
             <RoomInput placeholder='ex. 123' onChange={e => { setRoom(e.target.value) }} />
           </InputColumn>
@@ -185,7 +213,7 @@ export default () => {
             <FormLabel>Professor</FormLabel>
             <ProfessorInput placeholder='ex. MacArthur' onChange={e => { setProfessor(e.target.value) }} />
             <FormLabel>Professor Email</FormLabel>
-            <EmailInput placeholder='ex. macarthur@psu.edu' onChange={e => { setEmail(e.target.value) }} />
+            <EmailInput isValid={emailIsValid} placeholder='ex. macarthur@psu.edu' onChange={emailChange} />
           </InputColumn>
         </TextInputs>
         <DayInputs>
@@ -196,7 +224,7 @@ export default () => {
             </DaysRow>
           </InputColumn>
           <InputColumn>
-            <SubmitButton onClick={addCourse}>ADD COURSE</SubmitButton>
+            <SubmitButton disabled={buttonIsActive} onClick={addCourse}>ADD COURSE</SubmitButton>
           </InputColumn>
         </DayInputs>
       </FormContainer>
