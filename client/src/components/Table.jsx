@@ -125,17 +125,17 @@ export default () => {
       </CellContainer>
     </Cell>;
 
-  const rows = data => data.map((row, i) => 
-    <Row key={i}>
-      {actions(row._id)}{cells(row)}
-    </Row>);
-
   const cells = row => ['Course', 'Room', 'Professor', 'Email', 'Days'].map((key, i) => 
     <Cell key={i} field={key}>
       <CellContainer align={columns[key].align}>
         {key === 'Days' ? days(row.Days) : row[key]}
       </CellContainer>
     </Cell>);
+
+  const rows = data => data.map((row, i) => 
+    <Row key={i}>
+      {actions(row._id)}{cells(row)}
+    </Row>);
 
   const form = formToggle ? <Form /> : null;
   const addRecordButton = <IconButton onClick={toggleForm}>{formToggle ? <Cancel /> : <Add />}</IconButton>;
