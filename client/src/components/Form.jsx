@@ -17,7 +17,7 @@ const Background = styled.div`
 const FormContainer = styled.div`
   z-index: 3;
   position:fixed;
-  background: #EDEDE3;
+  background: #F8F8F8;
   border-radius: 5px;
   padding: 15px 0px 20px 30px;
   width: 40%;
