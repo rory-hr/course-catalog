@@ -7,14 +7,6 @@ import Edit from '@material-ui/icons/Edit';
 import Delete from '@material-ui/icons/Delete';
 import { deleteRecord } from '../actions';
 
-const EditButton = styled.button`
-  
-`;
-
-const DeleteButton = styled.button`
-  
-`;
-
 export default ({ ID }) => {
   const serverIP = useSelector(state => state.serverIP);
   const dispatch = useDispatch();
